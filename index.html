@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>디지털 책갈피 [사회 - 다양한 문화의 이해]</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Gaegu & Nanum Gothic maintained) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f1f5f9; /* Slate 100 배경색 */
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            color: #0f172a; /* Slate 900 */
+            line-height: 1.6;
+        }
+        .font-gaegu {
+            font-family: 'Gaegu', cursive;
+        }
+        
+        /* Dynamic Font Size Classes for Accessibility */
+        body.font-normal-mode { font-size: 16px; }
+        body.font-large-mode { font-size: 19px; }
+        body.font-xlarge-mode { font-size: 22px; }
+
+        .pulse-subtle {
+            animation: pulseSubtle 3s infinite ease-in-out;
+        }
+        @keyframes pulseSubtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a8a; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-normal-mode min-h-screen flex flex-col items-center justify-start p-2 sm:p-4">
+
+    <div id="app" class="w-full max-w-4xl bg-white min-h-[94vh] rounded-2xl shadow-xl border border-slate-300 flex flex-col overflow-hidden relative">
+        
+        <!-- Header Banner -->
+        <header class="bg-slate-900 text-white px-4 py-3 sm:px-6 sm:py-4 border-b-4 border-blue-700 flex flex-wrap items-center justify-between gap-3 shadow-md">
+            <div class="flex items-center gap-3">
+                <!-- Badge SVG -->
+                <div class="bg-blue-800 text-white p-2.5 rounded-xl border border-blue-500 shadow-inner flex items-center justify-center">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 fill-current text-blue-200" viewBox="0 0 24 24">
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-blue-700 text-blue-100 text-[10px] sm:text-xs px-2 py-0.5 rounded font-extrabold uppercase tracking-wide border border-blue-500">
+                            느린학습자 맞춤 교육콘텐츠
+                        </span>
+                    </div>
+                    <h1 class="font-gaegu text-2xl sm:text-3xl font-extrabold text-white leading-tight mt-0.5">
+                        디지털 책갈피 <span class="text-amber-400">[사회]</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm font-bold text-slate-300">
+                        단원: 다양한 문화의 이해 <span class="text-blue-300 font-normal">(맞춤형 차근차근 배움터)</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Accessibility Support Controls Bar -->
+            <div class="flex items-center gap-2 flex-wrap ml-auto">
+                <div class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-200 shadow-inner">
+                    <span class="text-blue-300">🔎 글자:</span>
+                    <button onclick="setFontSize('normal')" id="btnFontNormal" class="px-2 py-0.5 rounded bg-blue-700 text-white font-bold border border-blue-500 transition">보통</button>
+                    <button onclick="setFontSize('large')" id="btnFontLarge" class="px-2 py-0.5 rounded bg-slate-700 text-slate-200 hover:bg-slate-600 font-bold border border-slate-600 transition">크게</button>
+                    <button onclick="setFontSize('xlarge')" id="btnFontXLarge" class="px-2 py-0.5 rounded bg-slate-700 text-slate-200 hover:bg-slate-600 font-bold border border-slate-600 transition">아주크게</button>
+                </div>
+
+                <button id="ttsToggleBtn" onclick="toggleTTS()" class="bg-blue-700 hover:bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-1.5 shadow border border-blue-500 active:scale-95 transition">
+                    <span id="ttsIcon">🔊</span>
+                    <span class="hidden sm:inline">음성안내</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="bg-slate-100 px-4 py-2.5 sm:px-6 border-b border-slate-300 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-slate-800">
+                <span class="bg-slate-800 text-white px-2 py-0.5 rounded text-xs">진행 현황</span>
+                <span id="stepTitleText" class="text-blue-900 font-bold">0단계: 학습자 등록</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700">
+                    <span>이수율:</span>
+                    <div class="w-24 sm:w-32 bg-slate-300 rounded-full h-3 overflow-hidden border border-slate-400">
+                        <div id="progressBarFill" class="bg-blue-700 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <span id="stepPercentBadge" class="text-blue-900 font-extrabold text-xs bg-blue-100 px-2 py-0.5 rounded-full border border-blue-300">
+                        0%
+                    </span>
+                </div>
+
+                <div class="hidden sm:flex items-center gap-1 border-l border-slate-300 pl-3 text-xs font-bold text-slate-600">
+                    <span>인증 스티커:</span>
+                    <div id="topStickerMiniGrid" class="flex gap-1">
+                        <span class="w-5 h-5 rounded bg-slate-200 border border-slate-300 flex items-center justify-center text-xs">📖</span>
+                        <span class="w-5 h-5 rounded bg-slate-200 border border-slate-300 flex items-center justify-center text-xs opacity-40">✏️</span>
+                        <span class="w-5 h-5 rounded bg-slate-200 border border-slate-300 flex items-center justify-center text-xs opacity-40">🧩</span>
+                        <span class="w-5 h-5 rounded bg-slate-200 border border-slate-300 flex items-center justify-center text-xs opacity-40">🌟</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav id="stepTabBar" class="bg-slate-200/90 p-1.5 border-b border-slate-300 flex items-center gap-1 sm:gap-2 overflow-x-auto">
+            <button id="tab0" onclick="attemptGoStep(0)" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-blue-900 text-white border-blue-950">
+                👤 학습자 등록
+            </button>
+            <button id="tab1" onclick="attemptGoStep(1)" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-white text-slate-800 border-slate-300 hover:bg-slate-100">
+                📖 [활동 1] 개념이해
+            </button>
+            <button id="tab2" onclick="attemptGoStep(2)" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-white text-slate-800 border-slate-300 hover:bg-slate-100">
+                ✏️ [활동 2] 퀴즈풀이
+            </button>
+            <button id="tab3" onclick="attemptGoStep(3)" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-white text-slate-800 border-slate-300 hover:bg-slate-100">
+                🧩 [활동 3] 태도탐구
+            </button>
+            <button id="tab4" onclick="attemptGoStep(4)" class="tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-white text-slate-800 border-slate-300 hover:bg-slate-100">
+                🌟 [활동 4] 배움정리
+            </button>
+        </nav>
+
+        <main class="flex-1 p-4 sm:p-6 flex flex-col justify-between overflow-y-auto bg-slate-50">
+            
+            <!-- STEP 0: User Registration Screen -->
+            <section id="step0" class="step-screen flex-1 flex flex-col justify-between">
+                <div class="space-y-6 max-w-2xl mx-auto w-full">
+                    <div class="bg-white border-t-4 border-blue-800 p-5 sm:p-6 rounded-xl border-x border-b border-slate-300 shadow-sm text-center">
+                        <div class="inline-flex bg-blue-100 p-3 rounded-full mb-2 border border-blue-300 text-3xl">
+                            🏛️
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-gaegu">디지털 책갈피 배움터에 오신 것을 환영합니다</h2>
+                        <p class="text-sm sm:text-base font-bold text-slate-600 mt-1">학습자 성명과 함께할 학습 친구 캐릭터를 지정해 주세요.</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-300 space-y-2 shadow-sm">
+                        <label class="block text-base font-extrabold text-slate-900">✏️ 학습자 성명 (또는 닉네임)</label>
+                        <input type="text" id="userNameInput" placeholder="이름을 입력하세요 (예: 홍길동)" class="w-full px-4 py-3 text-base font-bold border border-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 bg-slate-50 text-slate-900">
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-300 space-y-2 shadow-sm">
+                        <label class="block text-base font-extrabold text-slate-900">🐥 학습 도우미 캐릭터 선택</label>
+                        <div class="grid grid-cols-4 gap-3 text-center" id="characterPicker">
+                            <button onclick="selectCharacter('토끼', '🐰')" class="char-btn p-3 bg-slate-50 border-2 border-slate-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition focus:outline-none text-3xl sm:text-4xl shadow-sm">🐰</button>
+                            <button onclick="selectCharacter('곰돌이', '🐻')" class="char-btn p-3 bg-slate-50 border-2 border-slate-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition focus:outline-none text-3xl sm:text-4xl shadow-sm">🐻</button>
+                            <button onclick="selectCharacter('강아지', '🐶')" class="char-btn p-3 bg-slate-50 border-2 border-slate-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition focus:outline-none text-3xl sm:text-4xl shadow-sm">🐶</button>
+                            <button onclick="selectCharacter('고양이', '🐱')" class="char-btn p-3 bg-slate-50 border-2 border-slate-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition focus:outline-none text-3xl sm:text-4xl shadow-sm">🐱</button>
+                        </div>
+                        <p id="selectedCharNotice" class="text-sm font-extrabold text-blue-900 mt-3 text-center bg-blue-50 py-2 rounded-lg border border-blue-200">선택된 친구: 🐰 토끼</p>
+                    </div>
+                </div>
+
+                <button onclick="startLearning()" class="w-full max-w-2xl mx-auto bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-lg sm:text-xl py-4 rounded-xl shadow-md border-b-4 border-blue-950 active:translate-y-0.5 transition flex items-center justify-center gap-2 mt-6">
+                    <span>사회 단원 학습 시작하기</span>
+                    <span>🚀</span>
+                </button>
+            </section>
+
+            <section id="step1" class="step-screen flex-1 flex-col justify-between hidden">
+                <div class="space-y-4">
+                    <div class="bg-white border-l-4 border-blue-800 p-4 rounded-xl border border-slate-300 flex flex-wrap items-center justify-between gap-2 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl sm:text-3xl">📘</span>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">활동 1: 핵심 학습 개념 이해</h3>
+                                <p class="text-xs sm:text-sm font-bold text-slate-600">카드 슬라이드를 통해 사회 단원의 핵심 개념을 확인하세요.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button onclick="openSummaryModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 border border-slate-300 shadow-sm">
+                                <span>📄 한눈에 요약</span>
+                            </button>
+                            <button onclick="readCurrentConceptCard()" class="bg-blue-800 hover:bg-blue-900 text-white text-xs sm:text-sm font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm">
+                                <span>🔊 소리로 듣기</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Concept Card Box -->
+                    <div id="conceptCardContainer" class="bg-white border-t-4 border-blue-700 border-x border-b border-slate-300 rounded-xl p-5 sm:p-6 shadow-sm min-h-[300px] flex flex-col justify-between">
+                    </div>
+
+                    <!-- Indicator Dots -->
+                    <div class="flex justify-center gap-2 my-2" id="conceptDots"></div>
+                </div>
+
+                <div class="flex gap-3 mt-4">
+                    <button id="prevCardBtn" onclick="changeConceptCard(-1)" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold py-3.5 rounded-xl border border-slate-300 text-sm sm:text-base disabled:opacity-40">
+                        ◀ 이전 개념
+                    </button>
+                    <button id="nextCardBtn" onclick="changeConceptCard(1)" class="w-2/3 bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-base sm:text-lg py-3.5 rounded-xl border-b-4 border-blue-950 shadow flex items-center justify-center gap-2">
+                        <span>다음 개념</span>
+                        <span>➡️</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="step2" class="step-screen flex-1 flex-col justify-between hidden">
+                <div class="space-y-3">
+                    <div class="bg-white border-l-4 border-emerald-700 p-4 rounded-xl border border-slate-300 flex justify-between items-center shadow-sm">
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">활동 2: 문화 속성 및 사례 형성 평가 (총 7문항)</h3>
+                            <p class="text-xs sm:text-sm font-bold text-slate-600">7문항을 모두 풀어야 이수가 완결됩니다.</p>
+                        </div>
+                        <button onclick="readCurrentActivityQuestion()" class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs sm:text-sm font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm">
+                            <span>🔊 문항 읽기</span>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs sm:text-sm font-extrabold text-slate-800 bg-slate-200/80 px-4 py-2 rounded-lg border border-slate-300">
+                        <span id="act2ProgressText">문항 1 / 7</span>
+                        <span id="act2ScoreText" class="text-blue-900 font-extrabold bg-blue-100 px-3 py-1 rounded border border-blue-300">완료한 문항: 0 / 7</span>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div class="bg-white border-t-4 border-emerald-600 border-x border-b border-slate-300 rounded-xl p-5 text-center min-h-[160px] flex flex-col justify-center items-center shadow-sm relative">
+                        <span id="act2CategoryBadge" class="absolute top-3 left-4 text-xs font-extrabold bg-slate-100 text-slate-800 px-3 py-1 rounded border border-slate-300">
+                            문화의 속성
+                        </span>
+                        <span id="act2Icon" class="text-4xl sm:text-5xl mt-4 mb-2 block">🥣</span>
+                        <p id="act2QuestionText" class="text-base sm:text-xl font-extrabold text-slate-900 leading-relaxed max-w-xl">
+                            설날에 온 가족이 모여 세배를 하고 떡국을 나누어 먹는 행동은 무엇일까요?
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1" id="act2Choices"></div>
+
+                    <div id="activityFeedback" class="hidden p-3.5 rounded-lg text-center font-extrabold text-sm sm:text-base border shadow-sm"></div>
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <div class="flex gap-2">
+                        <button id="act2PrevBtn" onclick="changeAct2Question(-1)" class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold py-3 rounded-xl border border-slate-300 text-xs sm:text-base">
+                            ◀ 이전 문항
+                        </button>
+                        <button id="act2NextBtn" onclick="changeAct2Question(1)" class="w-1/2 bg-slate-700 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl border border-slate-800 text-xs sm:text-base">
+                            다음 문항 ▶
+                        </button>
+                    </div>
+
+                    <button id="step2NextBtn" onclick="finishStep2()" class="w-full bg-slate-300 text-slate-800 font-extrabold text-sm sm:text-base py-3.5 rounded-xl border border-slate-400 shadow flex items-center justify-center gap-2 transition">
+                        <span id="step2LockIcon">🔒</span>
+                        <span id="step2BtnText">7문항을 모두 풀면 3단계 이동 가능 (0/7)</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="step3" class="step-screen flex-1 flex-col justify-between hidden">
+                <div class="space-y-3">
+                    <div class="bg-white border-l-4 border-indigo-700 p-4 rounded-xl border border-slate-300 flex justify-between items-center shadow-sm">
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">활동 3: 문화를 바라보는 올바른 태도 탐구</h3>
+                            <p class="text-xs sm:text-sm font-bold text-slate-600">사례 글을 읽고 올바른 문화 관점 태도를 판별하세요.</p>
+                        </div>
+                        <button onclick="readAct4Question()" class="bg-indigo-800 hover:bg-indigo-900 text-white text-xs sm:text-sm font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm">
+                            <span>🔊 본문 읽기</span>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs sm:text-sm font-extrabold text-slate-800 bg-slate-200/80 px-4 py-2 rounded-lg border border-slate-300">
+                        <span id="act4ProgressText">사례 1 / 3</span>
+                        <span id="act4ScoreText" class="text-indigo-900 font-extrabold">해결: 0 / 3</span>
+                    </div>
+
+                    <div class="bg-white border-t-4 border-indigo-700 border-x border-b border-slate-300 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span id="act4Icon" class="text-3xl sm:text-4xl">👦</span>
+                            <h4 id="act4Title" class="font-extrabold text-slate-900 text-lg sm:text-xl">민수의 이야기</h4>
+                        </div>
+                        <p id="act4Text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200 min-h-[80px]">
+                            "더운 나라 사람들은 손으로 밥을 먹는대. 자연환경과 쌀 품종 때문에 손으로 먹는 게 더 편해서 생긴 문화니까 그들의 방식을 존중해야 해."
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5" id="act4Choices"></div>
+
+                    <div id="act4Feedback" class="hidden p-3 rounded-lg text-center font-extrabold text-sm sm:text-base border"></div>
+                </div>
+
+                <div class="flex gap-3 mt-4">
+                    <button id="act4PrevBtn" onclick="changeAct4Question(-1)" class="w-1/3 bg-slate-200 text-slate-800 font-extrabold py-3.5 rounded-xl border border-slate-300 text-sm sm:text-base disabled:opacity-40">
+                        이전
+                    </button>
+                    <button id="act4NextBtn" onclick="changeAct4Question(1)" class="w-2/3 bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-base sm:text-lg py-3.5 rounded-xl border-b-4 border-blue-950 shadow flex items-center justify-center gap-2">
+                        <span>다음 사례</span>
+                        <span>➡️</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="step4" class="step-screen flex-1 flex-col justify-between hidden">
+                <div class="space-y-4">
+                    <div class="bg-white border-l-4 border-amber-600 p-4 rounded-xl border border-slate-300 flex justify-between items-center shadow-sm">
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">활동 4: 나만의 배움 정리 노트</h3>
+                            <p class="text-xs sm:text-sm font-bold text-slate-600">공부한 내용을 바탕으로 올바른 약속 문장을 작성하세요.</p>
+                        </div>
+                        <button onclick="readLearningNotePrompt()" class="bg-blue-800 hover:bg-blue-900 text-white text-xs sm:text-sm font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 shadow-sm">
+                            <span>🔊 안내 읽기</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-300 space-y-4 font-bold text-base sm:text-lg text-slate-900 shadow-sm">
+                        <p class="text-lg sm:text-xl font-extrabold text-blue-900 border-b border-slate-200 pb-2">
+                            학습자 <span id="noteUserDisplay" class="text-blue-700 font-black underline underline-offset-4">홍길동</span> 님은 오늘 배운 사회 약속을 실천합니다.
+                        </p>
+                        
+                        <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <label class="block font-extrabold text-slate-900 text-sm sm:text-base">1. 다른 나라의 문화를 접했을 때의 올바른 자세:</label>
+                            <select id="noteSelect1" class="w-full bg-white p-3 rounded-lg border border-slate-400 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-700 text-sm sm:text-base">
+                                <option value="">-- 올바른 문장을 선택하세요 --</option>
+                                <option value="환경과 역사를 이해하는 '문화 상대주의' 태도를 가져요">환경과 역사를 이해하는 '문화 상대주의' 태도를 가져요 👍</option>
+                                <option value="우리 문화만 최고라는 '자문화 중심주의'를 가져요">우리 문화만 최고라는 '자문화 중심주의'를 가져요 ❌</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <label class="block font-extrabold text-slate-900 text-sm sm:text-base">2. 미디어(유튜브, 뉴스러닝) 정보를 이용할 때의 태도:</label>
+                            <select id="noteSelect2" class="w-full bg-white p-3 rounded-lg border border-slate-400 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-700 text-sm sm:text-base">
+                                <option value="">-- 올바른 문장을 선택하세요 --</option>
+                                <option value="출처가 확실한지 따져보는 '미디어 리터러시'를 실천해요">출처가 확실한지 따져보는 '미디어 리터러시'를 실천해요 🔍</option>
+                                <option value="무조건 100% 사실이라고 다 믿어요">무조건 100% 사실이라고 다 믿어요 ❌</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="finishStep4()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-base sm:text-lg py-4 rounded-xl shadow border-b-4 border-blue-950 mt-4 flex items-center justify-center gap-2">
+                    <span>배움 정리 노트 작성 완료 및 이수 증서 발급</span>
+                    <span>✨</span>
+                </button>
+            </section>
+
+            <section id="step5" class="step-screen flex-1 flex-col justify-between hidden">
+                <div class="text-center space-y-4">
+                    <div class="inline-flex bg-blue-100 p-3 rounded-full border border-blue-300 text-4xl">
+                        🎓
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-gaegu">사회 단원 학습 이수를 축하합니다</h2>
+                    <p class="text-sm sm:text-base font-bold text-slate-600">모든 개념 이해 및 형성 평가 과정을 정상적으로 완료하셨습니다.</p>
+
+                    <!-- Official Sticker Collection Board -->
+                    <div class="bg-white border-2 border-slate-300 rounded-xl p-4 shadow-sm relative max-w-lg mx-auto">
+                        <h4 class="font-gaegu text-2xl font-extrabold text-slate-900 mb-3 border-b border-slate-200 pb-1">⭐ 배움 성취 스티커 모음판 ⭐</h4>
+                        <div class="grid grid-cols-3 gap-3 py-1" id="stickerGrid"></div>
+                        <p class="text-xs text-slate-500 font-bold mt-3">스티커를 클릭하면 축하 효과를 확인하실 수 있습니다.</p>
+                    </div>
+
+                    <!-- Certificate Box -->
+                    <div class="bg-white p-5 rounded-xl border-2 border-blue-900 text-left text-sm sm:text-base space-y-2 shadow-md max-w-lg mx-auto relative overflow-hidden">
+                        <div class="absolute right-3 top-3 opacity-10 pointer-events-none">
+                            <svg class="w-24 h-24 text-blue-900" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2zm0 18l-7-3.82v-4L12 16l7-3.82v4L12 20z"/>
+                            </svg>
+                        </div>
+                        <div class="flex justify-between items-center border-b-2 border-slate-300 pb-2">
+                            <span class="font-extrabold text-blue-900 text-base sm:text-lg">📜 사회 배움 이수 증서</span>
+                            <span id="cardDate" class="text-xs font-extrabold text-slate-600">2026.10.21</span>
+                        </div>
+                        <p class="text-slate-800 font-bold leading-relaxed pt-1">
+                            성명: <span id="cardUserName" class="font-black text-blue-900 underline text-lg">홍길동</span><br>
+                            상기 학생은 본 맞춤형 디지털 배움터의 <span class="text-blue-900 font-extrabold">'문화의 의미와 속성, 미디어, 문화를 바라보는 올바른 태도'</span> 교육 과정을 성실히 이수하였습니다.
+                        </p>
+                        <div class="text-right text-xs font-extrabold text-slate-500 pt-2 border-t border-slate-200">
+                            디지털 책갈피 학습인증
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mt-4 max-w-lg mx-auto w-full">
+                    <button onclick="openSummaryModal()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-base py-3.5 rounded-xl shadow border-b-4 border-blue-950">
+                        📄 핵심 요약정리 다시 읽기
+                    </button>
+                    <button onclick="restartApp()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold text-sm py-3 rounded-xl border border-slate-300">
+                        🔄 처음부터 다시 공부하기
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="summaryModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 z-50 hidden">
+        <div class="bg-white w-full max-w-lg rounded-xl border-2 border-blue-900 p-5 shadow-2xl max-h-[88vh] flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center border-b-2 border-slate-200 pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">📄</span>
+                        <h3 class="font-gaegu text-2xl sm:text-3xl font-extrabold text-slate-900">핵심 학습 요약 정리</h3>
+                    </div>
+                    <button onclick="closeSummaryModal()" class="text-slate-500 hover:text-slate-900 text-2xl font-black">✕</button>
+                </div>
+
+                <div class="space-y-3 overflow-y-auto max-h-[58vh] pr-1 text-sm sm:text-base text-slate-800 font-bold leading-relaxed">
+                    <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-300">
+                        <h4 class="font-extrabold text-blue-900 text-base mb-1 flex items-center gap-1">
+                            <span>1️⃣</span> <span>문화란?</span>
+                        </h4>
+                        <p class="text-slate-800">후천적으로 배워서 공유하는 공통 생활 모습 (예: 떡국 먹기, 인사하기)</p>
+                        <p class="text-xs text-rose-800 font-extrabold mt-1">❌ 문화가 아닌 것: 하품, 본능, 타고난 생김새, 나만의 습관</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-300">
+                        <h4 class="font-extrabold text-blue-900 text-base mb-1 flex items-center gap-1">
+                            <span>2️⃣</span> <span>문화의 5가지 속성</span>
+                        </h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm font-bold text-slate-800">
+                            <li><b>공유성:</b> 사회 구성원이 공통으로 가짐 (미역국)</li>
+                            <li><b>학습성:</b> 배워서 익힘 (식사 예절)</li>
+                            <li><b>축적성:</b> 세대를 거쳐 풍부해짐 (김치의 발전)</li>
+                            <li><b>변동성:</b> 시간 지나면서 변함 (한복 ➔ 양복)</li>
+                            <li><b>전체성:</b> 각 부분이 연결됨 (인터넷 ➔ 생활 변화)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-300">
+                        <h4 class="font-extrabold text-blue-900 text-base mb-1 flex items-center gap-1">
+                            <span>3️⃣</span> <span>미디어와 미디어 리터러시</span>
+                        </h4>
+                        <p class="text-xs sm:text-sm">인터넷이나 SNS 정보를 무조건 믿지 않고 출처를 비판적으로 확인하는 능력!</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-300">
+                        <h4 class="font-extrabold text-blue-900 text-base mb-1 flex items-center gap-1">
+                            <span>4️⃣</span> <span>문화를 바라보는 올바른 태도</span>
+                        </h4>
+                        <p class="text-xs sm:text-sm"><b>문화 상대주의 (바람직👍):</b> 그 나라의 환경과 역사를 이해하고 존중하기!</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeSummaryModal()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-extrabold text-base py-3 rounded-lg border-b-4 border-blue-950 shadow mt-3">
+                확인 및 창 닫기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global Application State Definition
+        let state = {
+            step: 0,
+            fontSize: 'normal',
+            ttsEnabled: true,
+            userName: '홍길동',
+            userChar: '🐰',
+            conceptIndex: 0,
+            act2Questions: [],
+            act2Index: 0,
+            act2Answered: [false, false, false, false, false, false, false],
+            act2Score: 0,
+            act4Index: 0,
+            act4SolvedCount: 0,
+            stickers: ['참 잘했어요!', '문화 박사', '리터러시 왕', '존중왕', '사회 매스터', '최고예요!']
+        };
+
+        // Concept Cards Dataset
+        const conceptCards = [
+            {
+                title: "1. 문화의 의미",
+                icon: "🥣",
+                text: "문화란 사람들이 사회에서 함께 살아가며 후천적으로 배워서 하는 공통적인 생활 모습이에요.\n(예: 설날에 떡국 먹기, 인사하기, 젓가락 사용하기)\n\n❌ 문화가 아닌 것: 배고파서 밥 먹는 본능, 하품하기, 타고난 생김새, 나만의 개인 습관",
+                badge: "후천적으로 배운 공통 생활 양식"
+            },
+            {
+                title: "2. 넓은 의미 vs 좁은 의미의 문화",
+                icon: "📖",
+                text: "• 넓은 의미: '주거 문화', '식문화'처럼 사람들이 살아가는 생활 방식 전체를 뜻해요.\n• 좁은 의미: '문화 상품권', '문화인'처럼 세련됨, 예술, 공연을 뜻해요.",
+                badge: "생활 방식 전체(넓은 의미) vs 예술/세련됨(좁은 의미)"
+            },
+            {
+                title: "3. 문화의 5가지 속성 (1/2)",
+                icon: "🍲",
+                text: "① 공유성: 같은 사회 구성원끼리 공통으로 가져요. (예: 한국인은 생일에 미역국을 먹음)\n② 학습성: 태어날 때부터 아는 게 아니라 후천적으로 배워서 익혀요. (예: 식사 예절 배움)\n③ 축적성: 세대를 거치며 지식이 쌓여 더 풍부해져요. (예: 김치 양념 지식의 발전)",
+                badge: "공유성, 학습성, 축적성"
+            },
+            {
+                title: "4. 문화의 5가지 속성 (2/2)",
+                icon: "👔",
+                text: "④ 변동성: 시간이 지나면서 문화는 지속적으로 변해요. (예: 한복 ➔ 양복 입기)\n⑤ 전체성(연합성): 문화의 여러 부분은 서로 연관되어 영향을 주고받아요. (예: 스마트폰 보급으로 공부, 쇼핑 방식 변화)",
+                badge: "변동성, 전체성"
+            },
+            {
+                title: "5. 미디어와 미디어 리터러시",
+                icon: "📱",
+                text: "• 미디어: 생각이나 정보를 전달하는 도구 (TV, 유튜브, SNS 등)\n• 미디어 리터러시: 인터넷 정보를 무조건 다 믿지 않고 출처가 확실한지 비판적으로 따져보고 올바르게 이용하는 능력!",
+                badge: "비판적 정보 판별 능력"
+            },
+            {
+                title: "6. 문화를 바라보는 올바른 태도",
+                icon: "🤝",
+                text: "• 자문화 중심주의: 우리 문화만 최고! (갈등 발생 ⚠️)\n• 문화 사대주의: 남의 나라 문화만 최고! (자부심 상실 ⚠️)\n• 문화 상대주의 (바람직👍): 그 나라의 환경과 역사를 이해하고 존중함!",
+                badge: "문화 상대주의 실천하기"
+            }
+        ];
+
+        // Step 2 Question Pool (7 Questions - Spoiler Free Categories)
+        const step2QuestionsPool = [
+            {
+                category: "문화의 의미",
+                question: "설날에 온 가족이 모여 세배를 하고 떡국을 나누어 먹는 행동은 무엇일까요?",
+                options: ["문화예요", "문화가 아니에요", "본능 현상", "개별 습관"],
+                answer: "문화예요",
+                icon: "🥣",
+                hint: "배워서 사회 구성원이 공통으로 행하는 공통 양식이에요."
+            },
+            {
+                category: "문화의 속성 탐구",
+                question: "한국 사람들은 생일에 미역국을 먹고, 국을 먹은 후 '시원하다!'라고 말하면 다 이해해요. 이 속성은?",
+                options: ["공유성", "변동성", "본능성", "단절성"],
+                answer: "공유성",
+                icon: "🍲",
+                hint: "같은 사회 구성원들이 공통으로 가지고 행동을 서로 예측할 수 있어요."
+            },
+            {
+                category: "문화의 속성 탐구",
+                question: "어릴 때 부모님과 선생님께 숟가락 사용법과 어른을 보면 고개 숙여 인사하는 예절을 배웠어요. 이 속성은?",
+                options: ["학습성", "축적성", "자연 현상", "타고난 생김새"],
+                answer: "학습성",
+                icon: "🙇‍♂️",
+                hint: "태어날 때부터 아는 것이 아니라 후천적으로 배워서 익혀요."
+            },
+            {
+                category: "문화의 속성 탐구",
+                question: "옛날 김치에 고춧가루와 다양한 양념 지식이 세대를 거치며 더해져 오늘날 맛있는 김치가 되었어요. 이 속성은?",
+                options: ["축적성", "변동성", "개별성", "고정성"],
+                answer: "축적성",
+                icon: "🥬",
+                hint: "오랜 세월을 거치면서 지식과 경험이 계속 쌓여 풍부해져요."
+            },
+            {
+                category: "문화의 속성 탐구",
+                question: "옛날 사람들은 매일 한복을 입고 다녔지만, 오늘날에는 편안한 양복이나 티셔츠를 주로 입어요. 이 속성은?",
+                options: ["변동성", "학습성", "영구성", "공유성"],
+                answer: "변동성",
+                icon: "👔",
+                hint: "시간이 지나고 환경이 바뀌면서 문화도 지속적으로 변화해요."
+            },
+            {
+                category: "문화의 속성 탐구",
+                question: "인터넷과 스마트폰이 보급되면서 공부 방식, 쇼핑 방식, 대화 방식이 서로 연관되어 함께 바뀌었어요. 이 속성은?",
+                options: ["전체성 (연합성)", "독립성", "변동성", "단율성"],
+                answer: "전체성 (연합성)",
+                icon: "📱",
+                hint: "문화의 여러 부분은 밀접하게 연결되어 서로 영향을 주고받아요."
+            },
+            {
+                category: "미디어 리터러시",
+                question: "인터넷 뉴스나 유튜브에 나오는 모든 정보는 100% 무조건 사실이므로 다 믿어야 한다.",
+                options: ["⭕ 그렇다 (O)", "❌ 아니다 (X)"],
+                answer: "❌ 아니다 (X)",
+                icon: "🔍",
+                hint: "가짜 뉴스나 광고가 섞여 있을 수 있으므로 출처를 비판적으로 확인해야 해요!"
+            }
+        ];
+
+        // Step 3 Activity Questions
+        const act4Questions = [
+            {
+                name: "민수",
+                icon: "👦",
+                text: "\"더운 나라 사람들은 손으로 밥을 먹는대. 자연환경과 쌀 품종 때문에 손으로 먹는 게 더 편해서 생긴 문화니까 그들의 방식을 존중해야 해.\"",
+                options: [
+                    { label: "자문화 중심주의", correct: false, feedback: "❌ 자문화 중심주의는 자기 문화만 최고라고 생각하는 태도예요." },
+                    { label: "문화 사대주의", correct: false, feedback: "❌ 문화 사대주의는 남의 문화만 최고라고 높이는 태도예요." },
+                    { label: "문화 상대주의 (바람직👍)", correct: true, feedback: "⭕ 정답이에요! 다른 나라의 환경과 문화를 이해하고 존중하는 '문화 상대주의' 태도입니다." }
+                ]
+            },
+            {
+                name: "철수",
+                icon: "🧑",
+                text: "\"외국 메뉴판에 영어가 쓰여 있는 게 한글보다 훨씬 멋있어 보여. 우리 한글은 별로야.\"",
+                options: [
+                    { label: "문화 사대주의", correct: true, feedback: "⭕ 정답이에요! 남의 나라 문화만 훌륭하고 우리 문화는 무시하는 '문화 사대주의' 태도입니다." },
+                    { label: "문화 상대주의", correct: false, feedback: "❌ 문화 상대주의는 서로를 똑같이 존중하는 태도예요." },
+                    { label: "자문화 중심주의", correct: false, feedback: "❌ 자문화 중심주의는 자기 문화만 존중하는 태도예요." }
+                ]
+            },
+            {
+                name: "영희",
+                icon: "👧",
+                text: "\"침대에서 신발을 신다니! 우리나라처럼 신발을 벗고 들어가야지, 저 사람들은 정말 이상하구나.\"",
+                options: [
+                    { label: "자문화 중심주의", correct: true, feedback: "⭕ 정답이에요! 자기 문화만 올바르고 다른 문화를 비하하는 '자문화 중심주의' 태도입니다." },
+                    { label: "문화 상대주의", correct: false, feedback: "❌ 다른 문화를 무시하는 것은 상대주의가 아니에요." },
+                    { label: "문화 사대주의", correct: false, feedback: "❌ 남의 문화를 올려다보는 것이 아니에요." }
+                ]
+            }
+        ];
+
+        function speakText(text) {
+            if (!state.ttsEnabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[^\w\sㄱ-ㅎㅏ-ㅣ가-힣!,?.]/gi, ' ');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'ko-KR';
+                utterance.rate = 0.78; // Slow & calm speed for slow learners
+                utterance.pitch = 1.0;
+                
+                const voices = window.speechSynthesis.getVoices();
+                const koVoice = voices.find(v => v.lang && (v.lang.includes('ko') || v.lang.includes('KO')));
+                if (koVoice) utterance.voice = koVoice;
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleTTS() {
+            state.ttsEnabled = !state.ttsEnabled;
+            const ttsIcon = document.getElementById('ttsIcon');
+            if (state.ttsEnabled) {
+                ttsIcon.textContent = "🔊";
+                speakText("음성 안내 기능이 켜졌습니다.");
+            } else {
+                ttsIcon.textContent = "🔇";
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            }
+        }
+
+        function setFontSize(size) {
+            state.fontSize = size;
+            document.body.className = `font-${size}-mode min-h-screen flex flex-col items-center justify-start p-2 sm:p-4`;
+            ['Normal', 'Large', 'XLarge'].forEach(type => {
+                const btn = document.getElementById(`btnFont${type}`);
+                if (btn) {
+                    if (type.toLowerCase() === size) {
+                        btn.className = "px-2 py-0.5 rounded bg-blue-700 text-white font-bold border border-blue-500 transition";
+                    } else {
+                        btn.className = "px-2 py-0.5 rounded bg-slate-700 text-slate-200 hover:bg-slate-600 font-bold border border-slate-600 transition";
+                    }
+                }
+            });
+        }
+
+        function openSummaryModal() {
+            document.getElementById('summaryModal').classList.remove('hidden');
+            speakText("핵심 요약 정리 화면입니다.");
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summaryModal').classList.add('hidden');
+        }
+
+        function attemptGoStep(targetStep) {
+            const solvedCount = state.act2Answered.filter(Boolean).length;
+            if (targetStep >= 3 && solvedCount < 7) {
+                const feedback = document.getElementById('activityFeedback');
+                if (feedback) {
+                    feedback.classList.remove('hidden');
+                    feedback.className = "p-3.5 rounded-lg text-center font-extrabold text-sm sm:text-base bg-amber-100 text-amber-950 border border-amber-300";
+                    feedback.innerHTML = `⚠️ 2단계 7문항을 모두 완수해야 3단계 이상으로 진행할 수 있습니다. (현재 완료: ${solvedCount}/7)`;
+                }
+                speakText("2단계 7문항을 모두 풀어야 3단계 이상으로 이동할 수 있습니다.");
+                setStep(2);
+                return;
+            }
+            setStep(targetStep);
+        }
+
+        function setStep(newStep) {
+            state.step = newStep;
+            document.querySelectorAll('.step-screen').forEach((el, idx) => {
+                if (idx === newStep) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+
+            for (let i = 0; i <= 4; i++) {
+                const tab = document.getElementById(`tab${i}`);
+                if (tab) {
+                    if (i === newStep) {
+                        tab.className = "tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-md bg-blue-900 text-white border-blue-950";
+                    } else {
+                        tab.className = "tab-btn flex-1 min-w-[120px] py-2 px-3 rounded-lg font-bold text-xs sm:text-sm border transition text-center shadow-sm bg-white text-slate-800 border-slate-300 hover:bg-slate-100";
+                    }
+                }
+            }
+
+            updateUI();
+        }
+
+        function updateUI() {
+            const percent = Math.round((state.step / 5) * 100);
+            document.getElementById('stepPercentBadge').textContent = `${percent}%`;
+            document.getElementById('progressBarFill').style.width = `${percent}%`;
+
+            const stepTitles = [
+                "0단계: 학습자 등록",
+                "1단계: 핵심 개념 이해 (활동 1)",
+                "2단계: 문화 사례 형성 평가 (활동 2)",
+                "3단계: 태도 탐구 (활동 3)",
+                "4단계: 배움 정리 노트 (활동 4)",
+                "5단계: 배움 이수 증서 발급"
+            ];
+            document.getElementById('stepTitleText').textContent = stepTitles[state.step];
+        }
+
+        function selectCharacter(name, icon) {
+            state.userChar = icon;
+            document.getElementById('selectedCharNotice').textContent = `선택된 학습 도우미: ${icon} ${name}`;
+            speakText(`${name} 도우미가 선택되었습니다.`);
+        }
+
+        function startLearning() {
+            const input = document.getElementById('userNameInput').value.trim();
+            if (input !== "") state.userName = input;
+            document.getElementById('noteUserDisplay').textContent = state.userName;
+            document.getElementById('cardUserName').textContent = state.userName;
+            
+            speakText(`환영합니다 ${state.userName} 님! 사회 단원 학습을 시작합니다.`);
+            setStep(1);
+            readCurrentConceptCard();
+        }
+
+        function renderConceptCard() {
+            const card = conceptCards[state.conceptIndex];
+            const container = document.getElementById('conceptCardContainer');
+            
+            container.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                        <span class="font-extrabold text-blue-900 text-lg sm:text-2xl">${card.title}</span>
+                        <span class="text-4xl sm:text-5xl">${card.icon}</span>
+                    </div>
+                    <p class="text-base sm:text-lg font-bold text-slate-800 whitespace-pre-line leading-relaxed">
+                        ${card.text}
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-200 flex justify-end">
+                    <span class="bg-blue-100 text-blue-900 text-xs sm:text-sm font-extrabold px-3 py-1.5 rounded border border-blue-300">
+                        💡 핵심: ${card.badge}
+                    </span>
+                </div>
+            `;
+
+            const dotsContainer = document.getElementById('conceptDots');
+            dotsContainer.innerHTML = conceptCards.map((_, idx) => `
+                <div class="h-2.5 rounded-full transition-all ${idx === state.conceptIndex ? 'w-8 bg-blue-800' : 'w-2.5 bg-slate-300'}"></div>
+            `).join('');
+
+            document.getElementById('prevCardBtn').disabled = state.conceptIndex === 0;
+            const nextBtn = document.getElementById('nextCardBtn');
+            if (state.conceptIndex === conceptCards.length - 1) {
+                nextBtn.innerHTML = `<span>2단계 퀴즈로 이동</span> <span>➡️</span>`;
+            } else {
+                nextBtn.innerHTML = `<span>다음 개념</span> <span>➡️</span>`;
+            }
+        }
+
+        function changeConceptCard(dir) {
+            if (dir === 1 && state.conceptIndex === conceptCards.length - 1) {
+                setStep(2);
+                readCurrentActivityQuestion();
+                return;
+            }
+            state.conceptIndex = Math.max(0, Math.min(conceptCards.length - 1, state.conceptIndex + dir));
+            renderConceptCard();
+            readCurrentConceptCard();
+        }
+
+        function readCurrentConceptCard() {
+            const card = conceptCards[state.conceptIndex];
+            speakText(`${card.title}. ${card.text}`);
+        }
+
+        function initStep2RandomQuestions() {
+            const shuffled = [...step2QuestionsPool].sort(() => Math.random() - 0.5);
+            state.act2Questions = shuffled;
+            state.act2Index = 0;
+            state.act2Answered = [false, false, false, false, false, false, false];
+            state.act2Score = 0;
+        }
+
+        function renderAct2Question() {
+            if (!state.act2Questions || state.act2Questions.length === 0) return;
+
+            const q = state.act2Questions[state.act2Index];
+            const solvedCount = state.act2Answered.filter(Boolean).length;
+
+            document.getElementById('act2ProgressText').textContent = `문항 ${state.act2Index + 1} / 7`;
+            document.getElementById('act2ScoreText').textContent = `완료한 문항: ${solvedCount} / 7`;
+            document.getElementById('act2CategoryBadge').textContent = q.category;
+            document.getElementById('act2Icon').textContent = q.icon;
+            document.getElementById('act2QuestionText').textContent = q.question;
+
+            const choicesContainer = document.getElementById('act2Choices');
+            choicesContainer.innerHTML = q.options.map(opt => `
+                <button onclick="checkAct2Answer('${opt.replace(/'/g, "\\'")}')" class="bg-slate-50 hover:bg-blue-100 text-slate-900 font-extrabold text-base py-3.5 px-4 rounded-lg border border-slate-300 shadow-sm active:scale-98 transition flex items-center justify-center text-center">
+                    ${opt}
+                </button>
+            `).join('');
+
+            const step2NextBtn = document.getElementById('step2NextBtn');
+            const lockIcon = document.getElementById('step2LockIcon');
+            const btnText = document.getElementById('step2BtnText');
+
+            if (solvedCount === 7) {
+                step2NextBtn.className = "w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base py-3.5 rounded-xl border-b-4 border-emerald-950 shadow flex items-center justify-center gap-2 transition";
+                lockIcon.textContent = "🔓";
+                btnText.textContent = "7문항 완수 완료! 3단계로 이동하기 ➡️";
+            } else {
+                step2NextBtn.className = "w-full bg-slate-300 text-slate-800 font-extrabold text-xs sm:text-base py-3.5 rounded-xl border border-slate-400 shadow flex items-center justify-center gap-2 transition opacity-90";
+                lockIcon.textContent = "🔒";
+                btnText.textContent = `7문항을 모두 풀어야 3단계 이동 가능 (${solvedCount}/7)`;
+            }
+
+            document.getElementById('act2PrevBtn').disabled = state.act2Index === 0;
+            document.getElementById('act2NextBtn').disabled = state.act2Index === 6;
+            document.getElementById('activityFeedback').classList.add('hidden');
+        }
+
+        function readCurrentActivityQuestion() {
+            if (!state.act2Questions || state.act2Questions.length === 0) return;
+            const q = state.act2Questions[state.act2Index];
+            speakText(`문항 ${state.act2Index + 1}. ${q.question}`);
+        }
+
+        function checkAct2Answer(userAns) {
+            const q = state.act2Questions[state.act2Index];
+            const feedback = document.getElementById('activityFeedback');
+            feedback.classList.remove('hidden');
+
+            const isCorrect = userAns === q.answer;
+            state.act2Answered[state.act2Index] = true;
+
+            if (isCorrect) {
+                state.act2Score++;
+                feedback.className = "p-3.5 rounded-lg text-center font-bold text-sm sm:text-base bg-emerald-100 text-emerald-900 border border-emerald-300";
+                feedback.innerHTML = `⭕ 정답입니다! (${q.hint})`;
+                speakText(`정답입니다! ${q.hint}`);
+            } else {
+                feedback.className = "p-3.5 rounded-lg text-center font-bold text-sm sm:text-base bg-rose-100 text-rose-900 border border-rose-300";
+                feedback.innerHTML = `❌ 정답은 '${q.answer}' 입니다. (${q.hint})`;
+                speakText(`정답은 ${q.answer} 입니다.`);
+            }
+
+            const solvedCount = state.act2Answered.filter(Boolean).length;
+            document.getElementById('act2ScoreText').textContent = `완료한 문항: ${solvedCount} / 7`;
+
+            setTimeout(() => {
+                if (solvedCount === 7) {
+                    renderAct2Question();
+                    feedback.className = "p-3.5 rounded-lg text-center font-bold text-sm sm:text-base bg-blue-100 text-blue-900 border border-blue-300";
+                    feedback.innerHTML = `🎉 7문항을 모두 완수하셨습니다! 하단의 3단계 이동 버튼을 눌러주세요.`;
+                    speakText("7문항을 모두 완료하셨습니다! 3단계로 이동할 수 있습니다.");
+                } else if (state.act2Index < 6) {
+                    state.act2Index++;
+                    renderAct2Question();
+                    readCurrentActivityQuestion();
+                } else {
+                    const firstUnsolved = state.act2Answered.findIndex(ans => !ans);
+                    if (firstUnsolved !== -1) {
+                        state.act2Index = firstUnsolved;
+                        renderAct2Question();
+                        readCurrentActivityQuestion();
+                    }
+                }
+            }, 1800);
+        }
+
+        function changeAct2Question(dir) {
+            state.act2Index = Math.max(0, Math.min(6, state.act2Index + dir));
+            renderAct2Question();
+            readCurrentActivityQuestion();
+        }
+
+        function finishStep2() {
+            const solvedCount = state.act2Answered.filter(Boolean).length;
+            if (solvedCount < 7) {
+                const remaining = 7 - solvedCount;
+                const feedback = document.getElementById('activityFeedback');
+                feedback.classList.remove('hidden');
+                feedback.className = "p-3.5 rounded-lg text-center font-bold text-sm sm:text-base bg-amber-100 text-amber-950 border border-amber-300";
+                feedback.innerHTML = `⚠️ 2단계 7문항을 모두 완료해 주세요. (남은 문항: ${remaining}개)`;
+                speakText(`남은 문항이 ${remaining}개 있습니다. 모두 완성해 주세요.`);
+                return;
+            }
+
+            setStep(3);
+            readAct4Question();
+        }
+
+        function renderAct4Question() {
+            const q = act4Questions[state.act4Index];
+            document.getElementById('act4ProgressText').textContent = `사례 ${state.act4Index + 1} / 3`;
+            document.getElementById('act4ScoreText').textContent = `해결: ${state.act4SolvedCount} / 3`;
+            document.getElementById('act4Icon').textContent = q.icon;
+            document.getElementById('act4Title').textContent = `${q.name}의 사례`;
+            document.getElementById('act4Text').textContent = q.text;
+
+            const choicesContainer = document.getElementById('act4Choices');
+            choicesContainer.innerHTML = q.options.map((opt, idx) => `
+                <button onclick="selectAct4Option(${idx})" class="w-full text-left bg-slate-50 hover:bg-blue-100 p-3.5 rounded-lg border border-slate-300 text-base font-extrabold text-slate-900 transition active:scale-98 flex items-center gap-3 shadow-sm">
+                    <span class="w-6 h-6 rounded bg-slate-200 text-slate-800 flex items-center justify-center text-xs font-black border border-slate-300">${idx + 1}</span>
+                    <span>${opt.label}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('act4Feedback').classList.add('hidden');
+            document.getElementById('act4PrevBtn').disabled = state.act4Index === 0;
+
+            const nextBtn = document.getElementById('act4NextBtn');
+            if (state.act4Index === act4Questions.length - 1) {
+                nextBtn.innerHTML = `<span>4단계로 이동</span> <span>➡️</span>`;
+            } else {
+                nextBtn.innerHTML = `<span>다음 사례</span> <span>➡️</span>`;
+            }
+        }
+
+        function readAct4Question() {
+            const q = act4Questions[state.act4Index];
+            speakText(`활동 3. ${q.name}의 사례. ${q.text} 이 생각은 무슨 태도일까요?`);
+        }
+
+        function selectAct4Option(optIdx) {
+            const q = act4Questions[state.act4Index];
+            const selected = q.options[optIdx];
+            const feedback = document.getElementById('act4Feedback');
+
+            feedback.classList.remove('hidden');
+            if (selected.correct) {
+                feedback.className = "p-3 rounded-lg text-center font-bold text-sm sm:text-base bg-emerald-100 text-emerald-900 border border-emerald-300";
+                feedback.innerHTML = selected.feedback;
+                speakText(selected.feedback);
+                state.act4SolvedCount = Math.max(state.act4SolvedCount, state.act4Index + 1);
+                document.getElementById('act4ScoreText').textContent = `해결: ${state.act4SolvedCount} / 3`;
+            } else {
+                feedback.className = "p-3 rounded-lg text-center font-bold text-sm sm:text-base bg-rose-100 text-rose-900 border border-rose-300";
+                feedback.innerHTML = selected.feedback;
+                speakText(selected.feedback);
+            }
+        }
+
+        function changeAct4Question(dir) {
+            if (dir === 1 && state.act4Index === act4Questions.length - 1) {
+                setStep(4);
+                readLearningNotePrompt();
+                return;
+            }
+            state.act4Index = Math.max(0, Math.min(act4Questions.length - 1, state.act4Index + dir));
+            renderAct4Question();
+            readAct4Question();
+        }
+
+        function readLearningNotePrompt() {
+            speakText("4단계 나만의 배움 정리 노트. 올바른 약속 문장을 선택해 주세요.");
+        }
+
+        function finishStep4() {
+            const sel1 = document.getElementById('noteSelect1').value;
+            const sel2 = document.getElementById('noteSelect2').value;
+
+            if (!sel1 || !sel2) {
+                speakText("약속 문장을 선택해 주십시오.");
+                return;
+            }
+
+            renderStickerGrid();
+            setStep(5);
+            triggerConfetti();
+            speakText(`축하합니다 ${state.userName} 님! 모든 학습 과정을 성실히 완성하셨습니다.`);
+        }
+
+        function renderStickerGrid() {
+            const grid = document.getElementById('stickerGrid');
+            grid.innerHTML = state.stickers.map((stk, idx) => `
+                <div onclick="popSticker(${idx})" class="cursor-pointer bg-slate-50 border border-slate-300 rounded-lg p-2.5 flex flex-col items-center justify-center text-center shadow-sm hover:border-blue-500 transition active:scale-95">
+                    <span class="text-3xl mb-1">${state.userChar}</span>
+                    <span class="font-gaegu text-slate-900 font-extrabold text-xs">${stk}</span>
+                </div>
+            `).join('');
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
+            document.getElementById('cardDate').textContent = dateStr;
+        }
+
+        function popSticker(idx) {
+            triggerConfetti();
+            speakText(`${state.stickers[idx]} 스티커 확인! 참 잘했습니다.`);
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function restartApp() {
+            state.step = 0;
+            state.conceptIndex = 0;
+            initStep2RandomQuestions();
+            state.act4Index = 0;
+            state.act4SolvedCount = 0;
+            document.getElementById('userNameInput').value = "";
+            setStep(0);
+        }
+
+        window.onload = function() {
+            initStep2RandomQuestions();
+            renderConceptCard();
+            renderAct2Question();
+            renderAct4Question();
+            setStep(0);
+        };
+    </script>
+</body>
+</html>
